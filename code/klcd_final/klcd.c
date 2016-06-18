@@ -32,7 +32,7 @@
 #include "klcd.h"
 
 #define DRIVER_AUTHOR	"Hong Moon <hsm5xw.gmail.com>"
-#define DRIVER_DESC	"a 16x2 character LCD (HD44780 LCD controller) driver with 4 bit mode"	
+#define DRIVER_DESC	"a 20x4 character LCD (HD44780 LCD controller) driver with 4 bit mode"	
 
 
 // ************ Core Functions ************************************
@@ -292,41 +292,22 @@ static void lcd_print(char * msg, unsigned int lineNumber)
 		return;
 	}
 
-	if( (lineNum != 1) && (lineNum != 2) ) { 
+	if( (lineNum < 1) || (lineNum > 4) ) { 
 		printk( KERN_DEBUG "ERR: Invalid line number readjusted to 1 \n");
 		lineNum = 1;
 	}
 
-	if( lineNum == 1 )
+	while( (*(msg) != '\0') && (lineNum <= 4) )
 	{
-		lcd_setLinePosition( LCD_FIRST_LINE );
-
+		lcd_setLinePosition( lineNum );
 		while( *(msg) != '\0' )
 		{
 			if(counter >=  NUM_CHARS_PER_LINE )
 			{
-				lineNum = 2;	// continue writing on the next line if the string is too long
+				lineNum++;	// continue writing on the next line if the string is too long
 				counter = 0;
 				break;		
 			}
-
-			lcd_data(*msg);
-			msg++;
-			counter++;
-		}
-	}
-
-	if( lineNum == 2)
-	{
-		lcd_setLinePosition( LCD_SECOND_LINE);
-		
-		while( *(msg) != '\0' )
-		{
-			if(counter >=  NUM_CHARS_PER_LINE )
-			{
-				 break;
-			}
-
 			lcd_data(*msg);
 			msg++;
 			counter++;
@@ -357,47 +338,29 @@ static void lcd_print_WithPosition(char * msg, unsigned int lineNumber, unsigned
 		return;
 	}
 
-	if( (lineNum != 1) && (lineNum != 2)  ){
+	if( (lineNum < 1) || (lineNum > 4)  ){
 		printk( KERN_DEBUG "ERR: Invalid line number input readjusted to 1 \n");
 		lineNum = 1;
 	}
 
-	if( lineNum == 1 )
-	{
-		lcd_setPosition( LCD_FIRST_LINE, nthChar );
-		
-		while( *(msg) != '\0' )
-		{
-			if( counter >= NUM_CHARS_PER_LINE )
-			{
-				lineNum = 2;  // continue writing on the next line if the string is too long
-				counter = 0;
+        while( (*(msg) != '\0') && (lineNum <= 4) )
+        {
+		lcd_setPosition( lineNum , nthChar );
+                while( *(msg) != '\0' )
+                {
+                        if(counter >=  NUM_CHARS_PER_LINE )
+                        {
+                                lineNum++;    // continue writing on the next line if the string is too long
+                                counter = 0;
 				nthChar = 0;
-				break;
-			}
-			lcd_data(*msg);
-			msg++;
-			counter++;
-		}
-	}
-
-	if( lineNum == 2)
-	{	
-		lcd_setPosition( LCD_SECOND_LINE, nthChar );
-
-		while( *(msg) != '\0' )
-		{
-			if( counter >= NUM_CHARS_PER_LINE )
-			{
-				break;
-			}	
-			lcd_data(*msg);
-			msg++;
-			counter++;
-		}
-	}
+                                break;
+                        }
+                        lcd_data(*msg);
+                        msg++;
+                        counter++;
+                }
+        }
 }
-
 /*
  * description:	set the cursor to the beginning of the line specified.
  * @param line  line number should be either 1 or 2.	
@@ -411,6 +374,12 @@ void lcd_setLinePosition(unsigned int line)
 	else if(line == 2){
 		lcd_instruction(0xC0);
 		lcd_instruction(0x00);
+	}
+	else if(line == 3){
+		lcd_setPosition( 1 , 20);
+        }
+	else if(line == 4){
+		lcd_setPosition( 2 , 20);
 	}
 	else{
 		printk("ERR: Invalid line number. Select either 1 or 2 \n");
@@ -439,6 +408,12 @@ void lcd_setPosition(unsigned int line, unsigned int nthCharacter)
 		lcd_instruction(  command & 0xF0 ); 	  // upper 4 bits of command
 		lcd_instruction( (command & 0x0F) << 4 ); // lower 4 bits of command
 	}
+	else if(line == 3){
+		lcd_setPosition(1,20+nthCharacter);
+	}
+        else if(line == 4){
+                lcd_setPosition(2,20+nthCharacter);
+        }
 	else{
 		printk("ERR: Invalid line number. Select either 1 or 2 \n");
 	}	
@@ -590,6 +565,14 @@ static long klcd_ioctl( struct file *p_file, unsigned int ioctl_command, unsigne
 			lcd_print( ioctl_arguments.kbuf, LCD_SECOND_LINE);
 			break;
 
+                case IOCTL_PRINT_ON_THIRDLINE:
+                        lcd_print( ioctl_arguments.kbuf, LCD_THIRD_LINE);
+                        break;
+
+                case IOCTL_PRINT_ON_FOURTHLINE:
+                        lcd_print( ioctl_arguments.kbuf, LCD_FOURTH_LINE);
+                        break;
+
 		case IOCTL_PRINT_WITH_POSITION:
 			lcd_print_WithPosition( ioctl_arguments.kbuf, ioctl_arguments.lineNumber, ioctl_arguments.nthCharacter);
 			break;
@@ -678,6 +661,9 @@ static int __init klcd_init(void)
 
 	// initialize LCD once
 	lcd_initialize();
+
+	// curseur off
+	lcd_cursor_off();
 
 	printk(KERN_INFO "klcd Driver Initialized. \n");
 	return 0;

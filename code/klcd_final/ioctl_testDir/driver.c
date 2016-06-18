@@ -53,7 +53,7 @@ int main ( int argc, char *argv[] )
 	msg.lineNumber   = (unsigned int) strtoul(argv[3],&pEnd1,10);
 	msg.nthCharacter = (unsigned int) strtoul(argv[4],&pEnd2,10);
 
-	//****************************************************************************************   
+	// ****************************************************************************************   
 
 	fd = open("/dev/klcd", O_WRONLY | O_NDELAY);
 	if(fd < 0){
@@ -87,6 +87,20 @@ int main ( int argc, char *argv[] )
 			if( ioctl( fd, (unsigned int) IOCTL_PRINT_ON_SECONDLINE, &msg) < 0)
 				perror("[ERROR] IOCTL_PRINT_ON_SECONDLINE \n");			
 			break;		
+
+                case (IOCTL_PRINT_ON_THIRDLINE ):
+                        printf("KLCD IOCTL Option: Print on Third Line \n");   
+
+                        if( ioctl( fd, (unsigned int) IOCTL_PRINT_ON_THIRDLINE, &msg) < 0)
+                                perror("[ERROR] IOCTL_PRINT_ON_SECONDLINE \n");
+                        break;          
+
+                case (IOCTL_PRINT_ON_FOURTHLINE ):
+                        printf("KLCD IOCTL Option: Print on Fourth Line \n");   
+
+                        if( ioctl( fd, (unsigned int) IOCTL_PRINT_ON_FOURTHLINE, &msg) < 0)
+                                perror("[ERROR] IOCTL_PRINT_ON_SECONDLINE \n");
+                        break;          
 
 		// print on the specified position (line number, nth Character) of the LCD. 
 		case (IOCTL_PRINT_WITH_POSITION ):

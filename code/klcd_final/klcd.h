@@ -35,15 +35,17 @@
 
 #define LCD_FIRST_LINE		1
 #define LCD_SECOND_LINE		2
+#define LCD_THIRD_LINE		2
+#define LCD_FOURTH_LINE		2
 
-#define NUM_CHARS_PER_LINE      16  // the number of characters per line
+#define NUM_CHARS_PER_LINE      20  // the number of characters per line
 
 // ********* Linux driver Constants ******************************************************************
 
 #define MINOR_NUM_START		0   // minor number starts from 0
 #define MINOR_NUM_COUNT		1   // the number of minor numbers required
 
-#define MAX_BUF_LENGTH  	50  // maximum length of a buffer to copy from user space to kernel space
+#define MAX_BUF_LENGTH  	80  // maximum length of a buffer to copy from user space to kernel space
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
@@ -52,12 +54,13 @@
 
 #define IOCTL_CLEAR_DISPLAY 	  	'0'	// Identifiers for ioctl reqursts
 #define IOCTL_PRINT_ON_FIRSTLINE  	'1'
-#define IOCTL_PRINT_ON_SECONDLINE 	'2'	/* (Note) ioctl will not be called if this is unsigned int 2, which
-						          is a reserved number. Thus it is fixed to '2'
-						 */
-#define IOCTL_PRINT_WITH_POSITION 	'3'
-#define IOCTL_CURSOR_ON			'4'
-#define IOCTL_CURSOR_OFF		'5'
+#define IOCTL_PRINT_ON_SECONDLINE 	'2'	/* (Note) ioctl will not be called if this is unsigned int 2, which*/
+#define IOCTL_PRINT_ON_THIRDLINE 	'3'
+#define IOCTL_PRINT_ON_FOURTHLINE 	'4'     /* is a reserved number. Thus it is fixed to '2' */
+
+#define IOCTL_PRINT_WITH_POSITION 	'5'
+#define IOCTL_CURSOR_ON			'6'
+#define IOCTL_CURSOR_OFF		'7'
 
 struct ioctl_mesg{				// a structure to be passed to ioctl argument
 	char kbuf[MAX_BUF_LENGTH];

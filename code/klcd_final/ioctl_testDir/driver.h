@@ -19,13 +19,13 @@
 
 #include <linux/ioctl.h>
 
-#define MAX_BUF_LENGTH  	50  /* maximum length of a buffer to copy from user space to kernel space
+#define MAX_BUF_LENGTH  	80  /* maximum length of a buffer to copy from user space to kernel space
 				       (MUST NOT CHANGE THIS)
 				    */
 struct ioctl_mesg{
 	char kbuf[MAX_BUF_LENGTH];	// a string to be printed on the LCD
 
-	unsigned int lineNumber;	// line number (should be either 1 or 2)
+	unsigned int lineNumber;	// line number (should be in  1 - 4)
 	unsigned int nthCharacter;	// nth Character of a line (0 refers to the beginning of the line)
 };
 
@@ -34,13 +34,14 @@ struct ioctl_mesg{
 #define KLCD_MAGIC_NUMBER   		0xBC  // a "magic" number to uniquely identify the device 
 
 #define IOCTL_CLEAR_DISPLAY 	  	'0'   // Identifiers for ioctl reqursts
-#define IOCTL_PRINT_ON_FIRSTLINE  	'1'
-#define IOCTL_PRINT_ON_SECONDLINE 	'2'	/* (Note) ioctl will not be called if this is unsigned int 2, which
-						          is a reserved number. Thus it is fixed to '2'
-						 */
-#define IOCTL_PRINT_WITH_POSITION 	'3'
-#define IOCTL_CURSOR_ON			'4'
-#define IOCTL_CURSOR_OFF		'5'
+#define IOCTL_PRINT_ON_FIRSTLINE        '1'
+#define IOCTL_PRINT_ON_SECONDLINE       '2'     /* (Note) ioctl will not be called if this is unsigned int 2, which*/
+#define IOCTL_PRINT_ON_THIRDLINE        '3'
+#define IOCTL_PRINT_ON_FOURTHLINE       '4'     /* is a reserved number. Thus it is fixed to '2' */
+
+#define IOCTL_PRINT_WITH_POSITION 	'5'
+#define IOCTL_CURSOR_ON			'6'
+#define IOCTL_CURSOR_OFF		'7'
 
 #define WRITE_TEST_MODE1		'W'    // check error handling
 #define WRITE_TEST_MODE2		'X'
